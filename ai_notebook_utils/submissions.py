@@ -14,15 +14,20 @@ def score_answer(question_id: str, answer):
         myobj = {
             'answer': answer,
         }
-        bonus = requests.post(url, data=myobj, headers={
-                              'Authorization', f'Bearer {submission_token}'})
-        print("Your bonus materials can be found here: ", bonus)
+        result = requests.post(
+            url,
+            data=myobj,
+            headers={'Authorization', f'Bearer {submission_token}'}
+        )
+        print("Submission result: ", result)
 
 
 def ensure_token():
     global submission_token
     if submission_token is None:
-        print("To submit your answer, log in to https://ai.science/my-notebook-token and paste your personal token here: ")
+        print(
+            "To submit your answer, " +
+            "log in to https://ai.science/my-notebook-token and paste your personal token here: ")
         token_entered = input()
         if token_entered:
             token_validation_url = f'https://ai.science/api/v1/notebook-tokens/{token_entered}'
