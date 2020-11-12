@@ -1,22 +1,41 @@
 import requests
 
+submission_token: str = None
+ENDPOINT = "https://ai.science"
 
-def submit_answer(product_id: str, question_id: str, answer: str):
-    """Sends submission to unlock additional info."""
-    url = 'https://ai.science/api/v1/assignment-submissions'
-    myobj = {
-      'productId':product_id,
-      'questionId': question_id,
-      'answer': answer
-    }
-    res = requests.post(url, json=myobj, headers={
-      "Content-Type": "application/json"
-    })
-    if not res.ok:
-        print("An error has occurred. Please contact admin@ai.science")
+
+def score_answer(question_id: str, answer):
+    """Sends student submission to retrieve bonus materials."""
+    ensure_token()
+    global submission_token
+    if not submission_token:
+        print("No valid token available. Skipping submission.")
     else:
-      data = res.json()
-      if data["status"] == 'ok':
-        print("Your bonus materials can be found here: ", data["bonus"])
-      elif data["status"] == 'not-ok':
-        print(data["reason"])
+        url = f'{ENDPOINT}/api/v1/notebook-submissions'
+        myobj = {
+            'answer': answer,
+            'questionId': question_id
+        }
+        result = requests.post(
+            url,
+            data=myobj,
+            headers={'Authorization', f'Bearer {submission_token}'}
+        )
+        print("Submission result: ", result)
+
+
+def ensure_token():
+    global submission_token
+    if submission_token is None:
+        print(
+            "To submit your answer, " +
+            f"log in to {ENDPOINT}/my-notebook-token and paste your personal token here: ")
+        token_entered = input()
+        if token_entered:
+            token_validation_url = f'{ENDPOINT}/api/v1/notebook-tokens/{token_entered}'
+            res = requests.get(token_validation_url)
+            if res.status_code == 200:
+                submission_token = token_entered
+                return True
+    print("You need to enter a valid token to contine.")
+    return False
