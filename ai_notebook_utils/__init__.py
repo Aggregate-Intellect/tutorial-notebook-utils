@@ -1,6 +1,7 @@
 import requests
 import base64
 import json
+import numpy as np
 
 submission_token: str = None
 TOKEN_API_ENDPOINT = "https://ai.science"
@@ -14,7 +15,8 @@ def score_answer(question_id: str, answer):
         if not submission_token:
             print("No valid token available. Skipping submission.")
         else:
-            answer64 = base64.b64encode(answer).decode("ascii")
+            answer64 = base64.b64encode(
+                answer.astype(np.float32)).decode("ascii")
             url = f'{SUBMISSION_API_ENDPOINT}'
             payload = {
                 'answer64': answer64,
