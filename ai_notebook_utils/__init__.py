@@ -1,7 +1,9 @@
 import requests
+import base64
 
 submission_token: str = None
-ENDPOINT = "https://ai.science"
+TOKEN_API_ENDPOINT = "https://ai.science"
+SUBMISSION_API_ENDPOINT = "https://api.ai.science/v1/notebook-submissions"
 
 
 def score_answer(question_id: str, answer):
@@ -11,15 +13,17 @@ def score_answer(question_id: str, answer):
     if not submission_token:
         print("No valid token available. Skipping submission.")
     else:
-        url = f'{ENDPOINT}/api/v1/notebook-submissions'
-        myobj = {
-            'answer': answer,
-            'questionId': question_id
+        answer64 = base64.b64encode(answer)
+        url = f'{SUBMISSION_API_ENDPOINT}'
+        payload = {
+            'answer64': answer64,
+            'questionId': question_id,
+            'token': submission_token
         }
         result = requests.post(
             url,
-            data=myobj,
-            headers={'Authorization', f'Bearer {submission_token}'}
+            data=payload,
+            # headers={'Authorization', f'Bearer {submission_token}'}
         )
         print("Submission result: ", result)
 
@@ -29,10 +33,10 @@ def ensure_token():
     if submission_token is None:
         print(
             "To submit your answer, " +
-            f"log in to {ENDPOINT}/my-notebook-token and paste your personal token here: ")
+            f"log in to {TOKEN_API_ENDPOINT}/my-notebook-token and paste your personal token here: ")
         token_entered = input()
         if token_entered:
-            token_validation_url = f'{ENDPOINT}/api/v1/notebook-tokens/{token_entered}'
+            token_validation_url = f'{TOKEN_API_ENDPOINT}/api/v1/notebook-tokens/{token_entered}'
             res = requests.get(token_validation_url)
             if res.status_code == 200:
                 submission_token = token_entered
