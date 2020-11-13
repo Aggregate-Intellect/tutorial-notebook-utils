@@ -25,7 +25,11 @@ def score_answer(question_id: str, answer):
                 url,
                 data=json.dumps(payload),
             )
-            print("Submission result: ", result)
+            try:
+                print("Submission result: ", result.json()['body'])
+            except:
+                print("Something went wrong. Please contact admin@ai.science.")
+            return None
 
 
 def ensure_token():
