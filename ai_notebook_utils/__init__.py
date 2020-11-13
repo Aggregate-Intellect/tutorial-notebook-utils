@@ -1,5 +1,6 @@
 import requests
 import base64
+import json
 
 submission_token: str = None
 TOKEN_API_ENDPOINT = "https://ai.science"
@@ -22,8 +23,7 @@ def score_answer(question_id: str, answer):
             }
             result = requests.post(
                 url,
-                data=payload,
-                # headers={'Authorization', f'Bearer {submission_token}'}
+                data=json.dumps(payload),
             )
             print("Submission result: ", result)
 
