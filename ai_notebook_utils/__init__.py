@@ -13,7 +13,7 @@ def score_answer(question_id: str, answer):
         if not submission_token:
             print("No valid token available. Skipping submission.")
         else:
-            answer64 = base64.b64encode(answer)
+            answer64 = base64.b64encode(answer).decode("ascii")
             url = f'{SUBMISSION_API_ENDPOINT}'
             payload = {
                 'answer64': answer64,
